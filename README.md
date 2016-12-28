@@ -9,6 +9,7 @@ Super simple Salesforce Connector demo built with MuleSoft Anypoint Studio
 ```
 git clone https://github.com/markbutton/salesforce.git 
 cd salesforce
+```
 
 ### Get Anypoint Studio from mulesoft.com
 
