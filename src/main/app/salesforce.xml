@@ -8,7 +8,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 http://www.mulesoft.org/schema/mule/sfdc http://www.mulesoft.org/schema/mule/sfdc/current/mule-sfdc.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
-    <sfdc:config name="Salesforce__Basic_Authentication" username="mark.button@gmail.com" password="salesforce12" securityToken="RQKzMW4aLXjUzpV7bRGERqHyT"  doc:name="Salesforce: Basic Authentication" disableSessionInvalidation="true"/>
+    <sfdc:config name="Salesforce__Basic_Authentication" username="myUserName" password="myPassword" securityToken="myToken"  doc:name="Salesforce: Basic Authentication" disableSessionInvalidation="true"/>
     <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration"/>
     <flow name="salesforceFlow">
         <http:listener config-ref="HTTP_Listener_Configuration" path="/salesforce" allowedMethods="GET" doc:name="HTTP">
@@ -16,10 +16,11 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
                 <http:header headerName="Access-Control-Allow-Origin" value="*"/>
             </http:response-builder>
         </http:listener>
-        <sfdc:query config-ref="Salesforce__Basic_Authentication" query="#[&quot;SELECT id, name &quot; + (payload.field.isEmpty() ? &quot;&quot; : &quot;,&quot; + payload.field) +&quot; from &quot; + payload.object +&quot; where &quot; + payload.searchKey + &quot; like '%&quot; + payload.searchValue +&quot;%'&quot;]" doc:name="Salesforce"/>
+        <sfdc:query config-ref="Salesforce__Basic_Authentication" query="select id, name, phone, website from Account" doc:name="Salesforce"/>
         <set-variable variableName="response" value="#[[]]" mimeType="application/json" doc:name="Set blank response"/>
         <foreach doc:name="For Each">
-            <byte-array-to-string-transformer  doc:name="Byte Array to String"/>
+            <byte-array-to-object-transformer doc:name="Byte Array to Object"/>
+            <json:object-to-json-transformer doc:name="Object to JSON"/>
             <set-variable variableName="response" value="#[flowVars.response + payload]"  doc:name="Set response variable"/>
         </foreach>
         <set-payload value="#[response]"  doc:name="Set response"/>
