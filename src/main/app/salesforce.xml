@@ -1,23 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:sfdc="http://www.mulesoft.org/schema/mule/sfdc" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:spring="http://www.springframework.org/schema/beans" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/sfdc http://www.mulesoft.org/schema/mule/sfdc/current/mule-sfdc.xsd
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
     <sfdc:config name="Salesforce__Basic_Authentication" username="mark.button@gmail.com" password="salesforce12" securityToken="RQKzMW4aLXjUzpV7bRGERqHyT"  doc:name="Salesforce: Basic Authentication" disableSessionInvalidation="true"/>
     <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration"/>
     <flow name="salesforceFlow">
-        <http:listener config-ref="HTTP_Listener_Configuration" path="/salesforce" allowedMethods="GET" doc:name="HTTP"/>
-        <sfdc:query config-ref="Salesforce__Basic_Authentication" query="dsql:SELECT Id,Name,Phone,Website FROM Account" doc:name="Salesforce"/>
-        <set-variable variableName="response" value="#[[]]" doc:name="Set blank response"/>
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/salesforce" allowedMethods="GET" doc:name="HTTP">
+            <http:response-builder>
+                <http:header headerName="Access-Control-Allow-Origin" value="*"/>
+            </http:response-builder>
+        </http:listener>
+        <sfdc:query config-ref="Salesforce__Basic_Authentication" query="#[&quot;SELECT id, name &quot; + (payload.field.isEmpty() ? &quot;&quot; : &quot;,&quot; + payload.field) +&quot; from &quot; + payload.object +&quot; where &quot; + payload.searchKey + &quot; like '%&quot; + payload.searchValue +&quot;%'&quot;]" doc:name="Salesforce"/>
+        <set-variable variableName="response" value="#[[]]" mimeType="application/json" doc:name="Set blank response"/>
         <foreach doc:name="For Each">
-            <byte-array-to-string-transformer doc:name="Byte Array to String"/>
-            <set-variable variableName="response" value="#[flowVars.response + payload]" doc:name="Set response variable"/>
+            <byte-array-to-string-transformer  doc:name="Byte Array to String"/>
+            <set-variable variableName="response" value="#[flowVars.response + payload]"  doc:name="Set response variable"/>
         </foreach>
-        <set-payload value="#[response]" doc:name="Set response"/>
+        <set-payload value="#[response]"  doc:name="Set response"/>
         <byte-array-to-string-transformer doc:name="Byte Array to String"/>
         <logger message="Result: #[payload]" level="INFO" doc:name="Log results"/>
         <catch-exception-strategy doc:name="Catch Exception Strategy">
