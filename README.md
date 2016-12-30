@@ -1,7 +1,7 @@
 # MuleSoft
 Complete SOA Enterprise Architecture now available in an easy to use ESB by MuleSoft
 
-# Salesforce Example
+## Salesforce Example
 
 This example application demonstrates how to use MuleSoft Anypoint Studio to build a simple HTTP application to query Salesforce. 
 After reading this document, creating and running the example in Mule, you should be able to leverage what you have 
@@ -14,7 +14,7 @@ This document describes the details of the example within the context of Anypoin
 This document assumes that you are familiar with Mule ESB and the [Anypoint Studio interface](http://www.mulesoft.org/documentation/display/current/Anypoint+Studio+Essentials). 
 To increase your familiarity with Mule Studio, consider completing one or more [Anypoint Studio Tutorials](http://www.mulesoft.org/documentation/display/current/Basic+Studio+Tutorial).
 
-## Get the Code
+### Get the Code
 ```
 git clone https://github.com/markbutton/salesforce.git 
 ```
